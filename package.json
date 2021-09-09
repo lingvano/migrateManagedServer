@@ -1,0 +1,45 @@
+{
+  "name": "migratemanagedserver",
+  "version": "0.1.0",
+  "description": "Migrate sites like Wordpress between two servers with ssh access",
+  "main": "index.ts",
+  "scripts": {
+    "start": "ts-node src/index.ts",
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://matthias-fi@github.com/lingvano/migrateManagedServer.git"
+  },
+  "keywords": [
+    "Nodejs",
+    "typescript",
+    "automation"
+  ],
+  "author": "Matthias Fischer, Lingvano",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/lingvano/migrateManagedServer/issues"
+  },
+  "homepage": "https://github.com/lingvano/migrateManagedServer#readme",
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^4.31.0",
+    "@typescript-eslint/parser": "^4.31.0",
+    "eslint": "^7.32.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.24.2",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.1.0",
+    "husky": "^7.0.2",
+    "prettier": "^2.4.0",
+    "pretty-quick": "^3.1.1",
+    "ts-node": "^10.2.1",
+    "typescript": "^4.4.2"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged"
+    }
+  }
+}
