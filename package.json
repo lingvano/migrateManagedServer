@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/lingvano/migrateManagedServer#readme",
   "devDependencies": {
+    "@types/node": "^16.9.0",
     "@typescript-eslint/eslint-plugin": "^4.31.0",
     "@typescript-eslint/parser": "^4.31.0",
     "eslint": "^7.32.0",
