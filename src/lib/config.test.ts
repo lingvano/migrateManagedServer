@@ -10,15 +10,15 @@ describe('Valid configuration set up', () => {
   const servers = ['origin', 'destination'];
   servers.map((server) => {
     maybe(`Added environment variables for ssh access to ${server} server`, () => {
-      expect(typeof config.origin.host).toEqual('string');
-      expect(typeof config.origin.password).toEqual('string');
-      expect(typeof config.origin.port).toEqual('number');
-      expect(typeof config.origin.userName).toEqual('string');
+      expect(typeof config.server.host).toEqual('string');
+      expect(typeof config.server.password).toEqual('string');
+      expect(typeof config.server.port).toEqual('number');
+      expect(typeof config.server.userName).toEqual('string');
 
-      expect(config.origin.host.length).toBeGreaterThan(0);
-      expect(config.origin.password.length).toBeGreaterThan(0);
-      expect(config.origin.port).toBeGreaterThan(0);
-      expect(config.origin.userName.length).toBeGreaterThan(0);
+      expect(config.server.host.length).toBeGreaterThan(0);
+      expect(config.server.password.length).toBeGreaterThan(0);
+      expect(config.server.port).toBeGreaterThan(0);
+      expect(config.server.userName.length).toBeGreaterThan(0);
     });
   });
 });
