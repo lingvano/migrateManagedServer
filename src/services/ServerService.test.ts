@@ -1,6 +1,6 @@
 import ServerService from './ServerService';
 import config from '../lib/config';
-import { open } from 'fs';
+import { fileExists } from '../helpers/fileExists';
 
 describe('ServerService', () => {
   const skipCi = config.environment === 'ci' ? it.skip : it;
@@ -56,19 +56,6 @@ describe('ServerService', () => {
     },
     240000 // Test can take up to 4 minutes
   );
-});
 
-function fileExists(filePath: string) {
-  return new Promise((resolve, reject) => {
-    open(filePath, 'r', (err) => {
-      if (err) {
-        if (err.code === 'ENOENT') {
-          console.error('myfile does not exist');
-          reject(false);
-        }
-        throw err;
-      }
-      resolve(true);
-    });
   });
-}
+});
