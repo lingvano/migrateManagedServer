@@ -7,27 +7,18 @@ describe('Valid configuration set up', () => {
     expect(typeof config.environment).toEqual('string');
   });
 
-  maybe('Added environment variables for ssh access to origin server', () => {
-    expect(typeof config.originHost).toEqual('string');
-    expect(typeof config.originPassword).toEqual('string');
-    expect(typeof config.originPort).toEqual('number');
-    expect(typeof config.originUserName).toEqual('string');
+  const servers = ['origin', 'destination'];
+  servers.map((server) => {
+    maybe(`Added environment variables for ssh access to ${server} server`, () => {
+      expect(typeof config.origin.host).toEqual('string');
+      expect(typeof config.origin.password).toEqual('string');
+      expect(typeof config.origin.port).toEqual('number');
+      expect(typeof config.origin.userName).toEqual('string');
 
-    expect(config.originHost.length).toBeGreaterThan(0);
-    expect(config.originPassword.length).toBeGreaterThan(0);
-    expect(config.originPort).toBeGreaterThan(0);
-    expect(config.originUserName.length).toBeGreaterThan(0);
-  });
-
-  maybe('Added environment variables for ssh access to destination server', () => {
-    expect(typeof config.destinationHost).toEqual('string');
-    expect(typeof config.destinationPassword).toEqual('string');
-    expect(typeof config.destinationPort).toEqual('number');
-    expect(typeof config.destinationUserName).toEqual('string');
-
-    expect(config.destinationHost.length).toBeGreaterThan(0);
-    expect(config.destinationPassword.length).toBeGreaterThan(0);
-    expect(config.destinationPort).toBeGreaterThan(0);
-    expect(config.destinationUserName.length).toBeGreaterThan(0);
+      expect(config.origin.host.length).toBeGreaterThan(0);
+      expect(config.origin.password.length).toBeGreaterThan(0);
+      expect(config.origin.port).toBeGreaterThan(0);
+      expect(config.origin.userName.length).toBeGreaterThan(0);
+    });
   });
 });
