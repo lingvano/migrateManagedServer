@@ -18,4 +18,16 @@ describe('Valid configuration set up', () => {
     expect(config.originPort).toBeGreaterThan(0);
     expect(config.originUserName.length).toBeGreaterThan(0);
   });
+
+  maybe('Added environment variables for ssh access to destination server', () => {
+    expect(typeof config.destinationHost).toEqual('string');
+    expect(typeof config.destinationPassword).toEqual('string');
+    expect(typeof config.destinationPort).toEqual('number');
+    expect(typeof config.destinationUserName).toEqual('string');
+
+    expect(config.destinationHost.length).toBeGreaterThan(0);
+    expect(config.destinationPassword.length).toBeGreaterThan(0);
+    expect(config.destinationPort).toBeGreaterThan(0);
+    expect(config.destinationUserName.length).toBeGreaterThan(0);
+  });
 });
