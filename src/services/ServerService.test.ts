@@ -43,14 +43,14 @@ describe('ServerService', () => {
     ssh.dispose();
   });
 
-  skipCi(
+  skipCi.skip(
     'Can download origin folder',
     async () => {
       const ServerServiceInstance = new ServerService();
 
       await ServerServiceInstance.downloadOriginFolder();
 
-      const pathToOrigin = `${config.downloadsDir + config.originFolder}.tar.gz`;
+      const pathToOrigin = `${config.downloadsDir + config.origin.folder}.tar.gz`;
 
       expect(await fileExists(pathToOrigin)).toEqual(true);
     },

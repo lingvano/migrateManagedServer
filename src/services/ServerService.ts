@@ -12,29 +12,19 @@ export default class ServerService {
     const ssh = new NodeSSH();
 
     const credentials: Credentials = {
-      host: '',
-      username: '',
-      password: '',
+      host: config[server].host,
+      username: config[server].userName,
+      password: config[server].password,
     };
-
-    if (server === 'origin') {
-      credentials.host = config.originHost;
-      credentials.username = config.originUserName;
-      credentials.password = config.originPassword;
-    }
-
-    if (server === 'destination') {
-      // Setup credentials destination
-    }
 
     await ssh.connect({ ...credentials });
     return ssh;
   }
 
   async downloadOriginFolder() {
-    const originFolderPath = config.originPath + config.originFolder;
+    const originFolderPath = config.origin.path + config.origin.folder;
 
-    await this.getFolderFromOrigin(originFolderPath, config.originFolder);
+    await this.getFolderFromOrigin(originFolderPath, config.origin.folder);
   }
 
   async getFolderFromOrigin(folderPath: string, folderName: string) {
