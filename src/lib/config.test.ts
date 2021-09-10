@@ -12,5 +12,10 @@ describe('Valid configuration set up', () => {
     expect(typeof config.originPassword).toEqual('string');
     expect(typeof config.originPort).toEqual('number');
     expect(typeof config.originUserName).toEqual('string');
+
+    expect(config.originHost.length).toBeGreaterThan(0);
+    expect(config.originPassword.length).toBeGreaterThan(0);
+    expect(config.originPort).toBeGreaterThan(0);
+    expect(config.originUserName.length).toBeGreaterThan(0);
   });
 });
