@@ -30,10 +30,14 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      # Install application modules
+        env:
+          NODE_ENV: ci
+
       - name: install dependencies
         run: npm ci
 
-      # Perform tests
       - name: Lint code using eslint
         run: npm run-script lint
+        
+      - name: Run test suite
+        run: npm run-script test
