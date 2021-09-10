@@ -10,12 +10,15 @@ describe('ServerService', () => {
     expect(ServerServiceInstance).toBeDefined();
   });
 
-  skipCi('Can create a SSH connection to the origin server', async () => {
-    const ServerServiceInstance = new ServerService();
+  const servers: ['origin', 'destination'] = ['origin', 'destination'];
+  servers.map((server) => {
+    skipCi(`Can create a SSH connection to the ${server} server`, async () => {
+      const ServerServiceInstance = new ServerService();
 
-    const originSSH = await ServerServiceInstance.connectTo('origin');
-    expect(originSSH.isConnected()).toEqual(true);
-    originSSH.dispose();
+      const originSSH = await ServerServiceInstance.connectTo(server);
+      expect(originSSH.isConnected()).toEqual(true);
+      originSSH.dispose();
+    });
   });
 
   skipCi('Can download some dummy created file', async () => {
