@@ -1,3 +1,4 @@
+import path from 'path';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -7,5 +8,7 @@ const config = {
   originPort: process.env.ORIGIN_PORT || 22,
   originUserName: process.env.ORIGIN_USER || '',
   originPassword: process.env.ORIGIN_PASSWORD || '',
+  originFolder: process.env.ORIGIN_FOLDER || '',
+  downloadsDir: path.join('./', 'downloads'),
 };
 export default config;
