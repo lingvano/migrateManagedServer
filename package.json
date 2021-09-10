@@ -7,7 +7,8 @@
     "start": "ts-node src/index.ts",
     "build": "tsc",
     "test": "jest",
-    "lint": "eslint --ext .js,.ts --ignore-path .gitignore ./src"
+    "lint": "eslint --ext .js,.ts --ignore-path .gitignore ./src",
+    "cleanup": "mv downloads/Readme.md /tmp/ && rm -rf downloads && mkdir downloads && mv /tmp/Readme.md downloads/"
   },
   "repository": {
     "type": "git",
