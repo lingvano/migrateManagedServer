@@ -1,6 +1,7 @@
 import ServerService from './ServerService';
 import config from '../lib/config';
 import { fileExists } from '../helpers/fileExists';
+import { promises as fs } from 'fs';
 
 describe('ServerService', () => {
   const skipCi = config.environment === 'ci' ? it.skip : it;
@@ -57,5 +58,22 @@ describe('ServerService', () => {
     240000 // Test can take up to 4 minutes
   );
 
+  skipCi('Can upload files to the destination server', async () => {
+    const ServerServiceInstance = new ServerService();
+
+    const testFileName = 'someFile.tar.gz';
+    const testFilePath = config.downloadsDir + '/' + testFileName;
+    await fs.open(testFilePath, 'w');
+    expect(await fileExists(testFilePath)).toEqual(true);
+
+    await ServerServiceInstance.uploadFileToOrigin(folder);
+
+    const ssh = await ServerServiceInstance.connectTo('destination');
+    const ls = await ssh.execCommand('ls');
+    console.log(ls);
+    expect(ls.stdout.indexOf(testFileName)).toBeGreaterThan(1);
+
+    await fs.unlink(testFilePath);
+    expect(await fileExists(testFilePath)).toEqual(false);
   });
 });
