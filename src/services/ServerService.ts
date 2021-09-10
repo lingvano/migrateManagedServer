@@ -30,4 +30,20 @@ export default class ServerService {
     await ssh.connect({ ...credentials });
     return ssh;
   }
+
+  async downloadOriginFolder() {
+    const originFolderPath = config.originPath + config.originFolder;
+
+    await this.getFolderFromOrigin(originFolderPath, config.originFolder);
+  }
+
+  async getFolderFromOrigin(folderPath: string, folderName: string) {
+    const compressedFileName = folderName + '.tar.gz';
+    const localFilePath = config.downloadsDir + compressedFileName;
+
+    const ssh = await this.connectTo('origin');
+    await ssh.execCommand(`tar -czvf ${compressedFileName} ${folderName}`);
+    await ssh.getFile(localFilePath, compressedFileName);
+    ssh.dispose();
+  }
 }
