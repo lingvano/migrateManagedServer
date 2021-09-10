@@ -6,7 +6,7 @@
   "scripts": {
     "start": "ts-node src/index.ts",
     "build": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest",
     "lint": "eslint --ext .js,.ts --ignore-path .gitignore ./src"
   },
   "repository": {
@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/lingvano/migrateManagedServer#readme",
   "devDependencies": {
+    "@types/jest": "^27.0.1",
     "@types/node": "^16.9.0",
     "@typescript-eslint/eslint-plugin": "^4.31.0",
     "@typescript-eslint/parser": "^4.31.0",
@@ -34,8 +35,10 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^5.1.0",
     "husky": "^7.0.2",
+    "jest": "^27.1.1",
     "prettier": "^2.4.0",
     "pretty-quick": "^3.1.1",
+    "ts-jest": "^27.0.5",
     "ts-node": "^10.2.1",
     "typescript": "^4.4.2"
   },
