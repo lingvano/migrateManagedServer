@@ -62,14 +62,14 @@ describe('ServerService', () => {
     const ServerServiceInstance = new ServerService();
 
     const testFileName = 'someFile.tar.gz';
-    const testFilePath = config.downloadsDir + '/' + testFileName;
+    const testFilePath = config.downloadsDir + testFileName;
     await fs.open(testFilePath, 'w');
     expect(await fileExists(testFilePath)).toEqual(true);
 
-    await ServerServiceInstance.uploadFileToOrigin(folder);
+    await ServerServiceInstance.uploadFileToOrigin(testFilePath, testFileName);
 
     const ssh = await ServerServiceInstance.connectTo('destination');
-    const ls = await ssh.execCommand('ls');
+    const ls = await ssh.execCommand(`cd ${config.destination.path} && ls`);
     console.log(ls);
     expect(ls.stdout.indexOf(testFileName)).toBeGreaterThan(1);
 
