@@ -36,4 +36,11 @@ export default class ServerService {
     await ssh.getFile(localFilePath, compressedFileName);
     ssh.dispose();
   }
+
+  async uploadFileToOrigin(localFile: string, destinationFile: string) {
+    const ssh = await this.connectTo('destination');
+    await ssh.putFile(localFile, config.destination.path + destinationFile);
+    // TODO: Untar file
+    ssh.dispose();
+  }
 }
