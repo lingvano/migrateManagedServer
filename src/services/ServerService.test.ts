@@ -44,19 +44,15 @@ describe('ServerService', () => {
     ssh.dispose();
   });
 
-  skipCi.skip(
-    'Can download origin folder',
-    async () => {
-      const ServerServiceInstance = new ServerService();
+  it.skip('Can download origin folder', async () => {
+    const ServerServiceInstance = new ServerService();
 
-      await ServerServiceInstance.downloadOriginFolder();
+    await ServerServiceInstance.downloadOriginFolder();
 
-      const pathToOrigin = `${config.downloadsDir + config.origin.folder}.tar.gz`;
+    const pathToOrigin = `${config.downloadsDir + config.origin.folder}.tar.gz`;
 
-      expect(await fileExists(pathToOrigin)).toEqual(true);
-    },
-    240000 // Test can take up to 4 minutes
-  );
+    expect(await fileExists(pathToOrigin)).toEqual(true);
+  }, 240000); // Test can take up to 4 minutes
 
   skipCi('Can upload files to the destination server', async () => {
     const ServerServiceInstance = new ServerService();
