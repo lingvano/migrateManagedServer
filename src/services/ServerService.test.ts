@@ -2,6 +2,7 @@ import ServerService from './ServerService';
 import config from '../lib/config';
 import { fileExists } from '../helpers/fileExists';
 import { promises as fs } from 'fs';
+import logger from '../lib/logger';
 
 describe('ServerService', () => {
   const skipCi = config.environment === 'ci' ? it.skip : it;
@@ -9,6 +10,16 @@ describe('ServerService', () => {
   it('Can create a new instance of ServerService', () => {
     const ServerServiceInstance = new ServerService();
     expect(ServerServiceInstance).toBeDefined();
+  });
+
+  it('Can get the correct file path', () => {
+    const ServerServiceInstance = new ServerService();
+    const file = {
+      name: 'whatever',
+      path: '/downloads/',
+      extension: '.zip',
+    };
+    expect(ServerServiceInstance.getPath(file)).toEqual('/downloads/whatever.zip');
   });
 
   const servers: ['origin', 'destination'] = ['origin', 'destination'];
@@ -22,29 +33,42 @@ describe('ServerService', () => {
     });
   });
 
-  skipCi('Can download some dummy created file', async () => {
+  let downloadedFile: any = {};
+
+  skipCi('Can download some dummy created file from origin', async () => {
     const ServerServiceInstance = new ServerService();
 
     const ssh = await ServerServiceInstance.connectTo('origin');
 
-    const remoteFolderName = 'test_dir_created_by_test_runner';
-    await ssh.execCommand(`mkdir ${remoteFolderName}`);
-    await ssh.execCommand(`touch ${remoteFolderName}/testFile.txt`);
+    const remoteFolder = {
+      name: 'test_dir_created_by_test_runner' + Date.now(),
+      path: '',
+    };
+    await ssh.execCommand(`mkdir ${remoteFolder.name}`);
+    await ssh.execCommand(`touch ${remoteFolder.name}/testFile.txt`);
 
     const getCurrentDir = await ssh.execCommand('pwd');
-    const remoteFolderPath = getCurrentDir.stdout + '/' + remoteFolderName;
-    expect(typeof remoteFolderPath).toEqual('string');
-    expect(remoteFolderPath.length).toBeGreaterThan(1);
+    logger.info(`pwd is showing: ${getCurrentDir}`);
+    remoteFolder.path = getCurrentDir.stdout + '/';
 
-    await ServerServiceInstance.getFolderFromOrigin(remoteFolderPath, remoteFolderName);
-    const pathToOrigin = `${config.downloadsDir + remoteFolderName}.tar.gz`;
+    expect(typeof remoteFolder.path).toEqual('string');
+    expect(remoteFolder.path.length).toBeGreaterThan(1);
 
-    expect(await fileExists(pathToOrigin)).toEqual(true);
+    const localFile = await ServerServiceInstance.getFolderFromServer(remoteFolder, 'origin');
+    const pathToLocal = `${config.downloadsDir + remoteFolder.name}.tar.gz`;
 
+    expect(await fileExists(pathToLocal)).toEqual(true);
+    expect(localFile.path + localFile.name).toEqual(pathToLocal);
+
+    await ssh.execCommand(`rm ${remoteFolder.name}/testFile.txt`);
+    await ssh.execCommand(`rmdir ${remoteFolder.name}`);
+    await ssh.execCommand(`rm ${remoteFolder.name}.tar.gz`);
+
+    downloadedFile = localFile;
     ssh.dispose();
   });
 
-  it.skip('Can download origin folder', async () => {
+  it.skip('Can download a folder from origin', async () => {
     const ServerServiceInstance = new ServerService();
 
     await ServerServiceInstance.downloadOriginFolder();
@@ -57,12 +81,35 @@ describe('ServerService', () => {
   skipCi('Can upload files to the destination server', async () => {
     const ServerServiceInstance = new ServerService();
 
-    const testFileName = 'someFile.tar.gz';
+    const remoteFile = {
+      path: config.destination.path,
+      name: downloadedFile.name,
+      extension: '',
+    };
+
+    await ServerServiceInstance.uploadFileToServer(downloadedFile, remoteFile, 'destination');
+
+    const ssh = await ServerServiceInstance.connectTo('destination');
+    let ls = await ssh.execCommand(`cd ${remoteFile.path} && ls`);
+    logger.info(`ls: ${JSON.stringify(ls)}`);
+    expect(ls.stdout.indexOf(downloadedFile.name)).toBeGreaterThan(1);
+    await ssh.execCommand(`rm ${remoteFile.path}${remoteFile.name}`);
+
+    ls = await ssh.execCommand(`cd ${remoteFile.path} && ls`);
+    logger.info(`ls: ${JSON.stringify(ls)}`);
+    expect(ls.stdout.indexOf(downloadedFile.name)).toEqual(-1);
+  });
+
+  skipCi('Can migrate files between origin and destination server', async () => {
+    // TODO: under construction
+    const ServerServiceInstance = new ServerService();
+
+    const testFileName = 'migrationFile.tar.gz';
     const testFilePath = config.downloadsDir + testFileName;
     await fs.open(testFilePath, 'w');
     expect(await fileExists(testFilePath)).toEqual(true);
 
-    await ServerServiceInstance.uploadFileToOrigin(testFilePath, testFileName);
+    await ServerServiceInstance.migrateFiles(testFilePath, testFileName);
 
     const ssh = await ServerServiceInstance.connectTo('destination');
     const ls = await ssh.execCommand(`cd ${config.destination.path} && ls`);
