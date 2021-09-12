@@ -7,6 +7,7 @@
     "start": "ts-node src/index.ts",
     "build": "tsc",
     "test": "jest",
+    "testCi": "NODE_ENV=ci jest",
     "lint": "eslint --ext .js,.ts --ignore-path .gitignore ./src",
     "cleanup": "mv downloads/Readme.md /tmp/ && rm -rf downloads && mkdir downloads && mv /tmp/Readme.md downloads/"
   },

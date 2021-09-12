@@ -35,8 +35,8 @@ jobs:
 
       - name: Lint code using eslint
         run: npm run-script lint
-        
+
       - name: Run test suite
-        run: npm run-script test
+        run: npm run-script testCi
         env:
           NODE_ENV: ci
