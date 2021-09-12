@@ -1,7 +1,6 @@
 import ServerService from './ServerService';
 import config from '../lib/config';
 import { fileExists } from '../helpers/fileExists';
-import { promises as fs } from 'fs';
 import logger from '../lib/logger';
 
 describe('ServerService', () => {
@@ -38,19 +37,7 @@ describe('ServerService', () => {
   skipCi('Can download some dummy created file from origin', async () => {
     const ServerServiceInstance = new ServerService();
 
-    const ssh = await ServerServiceInstance.connectTo('origin');
-
-    const remoteFolder = {
-      name: 'test_dir_created_by_test_runner' + Date.now(),
-      path: '',
-    };
-    await ssh.execCommand(`mkdir ${remoteFolder.name}`);
-    await ssh.execCommand(`touch ${remoteFolder.name}/testFile.txt`);
-
-    const getCurrentDir = await ssh.execCommand('pwd');
-    logger.info(`pwd is showing: ${getCurrentDir}`);
-    remoteFolder.path = getCurrentDir.stdout + '/';
-
+    const remoteFolder = await createDummyFolder();
     expect(typeof remoteFolder.path).toEqual('string');
     expect(remoteFolder.path.length).toBeGreaterThan(1);
 
@@ -60,6 +47,8 @@ describe('ServerService', () => {
     expect(await fileExists(pathToLocal)).toEqual(true);
     expect(localFile.path + localFile.name).toEqual(pathToLocal);
 
+    // Cleanup on server
+    const ssh = await ServerServiceInstance.connectTo('origin');
     await ssh.execCommand(`rm ${remoteFolder.name}/testFile.txt`);
     await ssh.execCommand(`rmdir ${remoteFolder.name}`);
     await ssh.execCommand(`rm ${remoteFolder.name}.tar.gz`);
@@ -101,22 +90,43 @@ describe('ServerService', () => {
   });
 
   skipCi('Can migrate files between origin and destination server', async () => {
-    // TODO: under construction
     const ServerServiceInstance = new ServerService();
 
-    const testFileName = 'migrationFile.tar.gz';
-    const testFilePath = config.downloadsDir + testFileName;
-    await fs.open(testFilePath, 'w');
-    expect(await fileExists(testFilePath)).toEqual(true);
+    const originFolder = await createDummyFolder();
 
-    await ServerServiceInstance.migrateFiles(testFilePath, testFileName);
+    const destinationFolder = {
+      name: originFolder.name,
+      path: config.destination.path,
+    };
+
+    await ServerServiceInstance.migrateFiles(originFolder, destinationFolder);
 
     const ssh = await ServerServiceInstance.connectTo('destination');
     const ls = await ssh.execCommand(`cd ${config.destination.path} && ls`);
-    console.log(ls);
-    expect(ls.stdout.indexOf(testFileName)).toBeGreaterThan(1);
+    logger.info(`ls on destination server (Directory: '${config.destination.path}'): ${ls}`);
+    expect(ls.stdout.indexOf('testFile.txt')).toBeGreaterThan(1);
+    expect(ls.stdout.indexOf('test_dir_created_by_test_runner')).toEqual(-1);
 
-    await fs.unlink(testFilePath);
-    expect(await fileExists(testFilePath)).toEqual(false);
+    ssh.dispose();
   });
 });
+
+async function createDummyFolder() {
+  const ServerServiceInstance = new ServerService();
+  const ssh = await ServerServiceInstance.connectTo('origin');
+
+  const remoteFolder = {
+    name: 'test_dir_created_by_test_runner' + Date.now(),
+    path: '',
+  };
+  await ssh.execCommand(`mkdir ${remoteFolder.name}`);
+  await ssh.execCommand(`touch ${remoteFolder.name}/testFile.txt`);
+
+  const getCurrentDir = await ssh.execCommand('pwd');
+  logger.info(`pwd is showing: ${getCurrentDir}`);
+  remoteFolder.path = getCurrentDir.stdout + '/';
+
+  ssh.dispose();
+
+  return remoteFolder;
+}
