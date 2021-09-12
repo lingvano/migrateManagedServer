@@ -112,6 +112,8 @@ export default class ServerService {
     await ssh.execCommand(deleteFolder);
 
     ssh.dispose();
+
+    return true;
   }
 
   getPath(item: File | Folder) {
