@@ -45,7 +45,6 @@ describe('ServerService', () => {
     const pathToLocal = `${config.downloadsDir + remoteFolder.name}.tar.gz`;
 
     expect(await fileExists(pathToLocal)).toEqual(true);
-    expect(localFile.path + localFile.name).toEqual(pathToLocal);
 
     // Cleanup on server
     const ssh = await ServerServiceInstance.connectTo('origin');
@@ -87,6 +86,7 @@ describe('ServerService', () => {
     ls = await ssh.execCommand(`cd ${remoteFile.path} && ls`);
     logger.info(`ls: ${JSON.stringify(ls)}`);
     expect(ls.stdout.indexOf(downloadedFile.name)).toEqual(-1);
+    ssh.dispose();
   });
 
   skipCi('Can migrate files between origin and destination server', async () => {
@@ -94,18 +94,21 @@ describe('ServerService', () => {
 
     const originFolder = await createDummyFolder();
 
-    const destinationFolder = {
+    const destinationFile = {
       name: originFolder.name,
       path: config.destination.path,
+      extension: '.tar.gz',
     };
 
-    await ServerServiceInstance.migrateFiles(originFolder, destinationFolder);
+    await ServerServiceInstance.migrateFiles(originFolder, destinationFile);
 
     const ssh = await ServerServiceInstance.connectTo('destination');
     const ls = await ssh.execCommand(`cd ${config.destination.path} && ls`);
     logger.info(`ls on destination server (Directory: '${config.destination.path}'): ${ls}`);
     expect(ls.stdout.indexOf('testFile.txt')).toBeGreaterThan(1);
     expect(ls.stdout.indexOf('test_dir_created_by_test_runner')).toEqual(-1);
+
+    await ssh.execCommand(`cd ${config.destination.path} && rm testFile.txt`);
 
     ssh.dispose();
   });
