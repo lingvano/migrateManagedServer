@@ -1,5 +1,9 @@
 import path from 'path';
 import dotenv from 'dotenv';
+import logger from './logger';
+
+dotenv.config();
+logger.info(`dotenv.config({ path: .env.${process.env.NODE_ENV}});`);
 dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
 
 const origin = {
