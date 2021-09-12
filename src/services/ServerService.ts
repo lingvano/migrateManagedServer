@@ -48,7 +48,7 @@ export default class ServerService {
     await this.getFolderFromServer(folder, 'origin');
   }
 
-  async getFolderFromServer(folder: Folder, server: Server): Promise<Folder> {
+  async getFolderFromServer(folder: Folder, server: Server): Promise<File> {
     const compressedFileName = folder.name + '.tar.gz';
     const localFilePath = config.downloadsDir + compressedFileName;
 
@@ -68,7 +68,8 @@ export default class ServerService {
     logger.info(`Downloaded file from '${server}' to '${localFilePath}'`);
     return {
       path: config.downloadsDir,
-      name: compressedFileName,
+      name: folder.name,
+      extension: '.tar.gz',
     };
   }
 
@@ -83,13 +84,34 @@ export default class ServerService {
     ssh.dispose();
   }
 
-  async migrateFiles(originFolder: Folder, destinationFolder: Folder) {
-    await this.getFolderFromServer(originFolder, 'origin');
+  async migrateFiles(originFolder: Folder, destinationFile: File) {
+    const originFile = await this.getFolderFromServer(originFolder, 'origin');
 
-    const localFilePath = config.downloadsDir + originFolder.name;
-    if (!(await fileExists(localFilePath))) {
-      throw new Error(`Could not find origin files at ${localFilePath}`);
+    if (!(await fileExists(originFile.path))) {
+      throw new Error(`Could not find origin files at ${originFile.path}`);
     }
+
+    await this.uploadFileToServer(originFile, destinationFile, 'destination');
+
+    const ssh = await this.connectTo('destination');
+
+    const untar = `cd ${destinationFile.path} && tar -xf ${destinationFile.name}${destinationFile.extension}`;
+    logger.info(`Executing: ${untar}`);
+    await ssh.execCommand(untar);
+
+    const deleteTar = `cd ${destinationFile.path} && rm ${destinationFile.name}${destinationFile.extension}`;
+    logger.info(`Executing: ${deleteTar}`);
+    await ssh.execCommand(deleteTar);
+
+    const moveOutSubfolder = `cp -r ${destinationFile.path}${destinationFile.name}/* ${destinationFile.path}`;
+    logger.info(`Executing: ${moveOutSubfolder}`);
+    await ssh.execCommand(moveOutSubfolder);
+
+    const deleteFolder = `cd ${destinationFile.path} && rm -r ${destinationFile.name}`;
+    logger.info(`Executing: ${deleteFolder}`);
+    await ssh.execCommand(deleteFolder);
+
+    ssh.dispose();
   }
 
   getPath(item: File | Folder) {
