@@ -10,7 +10,8 @@
     "testCi": "NODE_ENV=ci jest",
     "lint": "eslint --ext .js,.ts --ignore-path .gitignore ./src",
     "cleanup": "mv downloads/Readme.md /tmp/ && rm -rf downloads && mkdir downloads && mv /tmp/Readme.md downloads/",
-    "migrateFiles": "ts-node src/cli/migrateFiles.ts"
+    "migrateFiles": "ts-node src/cli/migrateFiles.ts",
+    "migrateDatabase": "ts-node src/cli/migrateDatabase.ts"
   },
   "repository": {
     "type": "git",
