@@ -13,6 +13,13 @@ const origin = {
   password: process.env.ORIGIN_PASSWORD || '',
   folder: process.env.ORIGIN_FOLDER || '',
   path: process.env.ORIGIN_PATH || '/',
+  db: {
+    name: process.env.ORIGIN_DB_NAME || '',
+    host: process.env.ORIGIN_DB_HOST || '',
+    port: process.env.ORIGIN_DB_PORT || 3306,
+    userName: process.env.ORIGIN_DB_USER || '',
+    password: process.env.ORIGIN_DB_PASSWORD || '',
+  },
 };
 
 const destination = {
@@ -22,6 +29,13 @@ const destination = {
   password: process.env.DESTINATION_PASSWORD || '',
   folder: process.env.DESTINATION_FOLDER || '',
   path: process.env.DESTINATION_PATH || '/',
+  db: {
+    name: process.env.DESTINATION_DB_NAME || '',
+    host: process.env.DESTINATION_DB_HOST || '',
+    port: process.env.DESTINATION_DB_PORT || 3306,
+    userName: process.env.DESTINATION_DB_USER || '',
+    password: process.env.DESTINATION_DB_PASSWORD || '',
+  },
 };
 
 const config = {
