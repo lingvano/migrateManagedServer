@@ -39,7 +39,15 @@ export default class DatabaseService {
     
     use ${config.destination.db.name}
 
-    source ${dbFile}
+    source ${dbFile};
+
+
+    ### ALTERNATIVE: 
+    
+    Run this:
+
+    mysql -u ${config.destination.db.userName} -p${config.destination.db.password} -h ${config.destination.db.host} -P ${config.destination.db.port} -D ${config.destination.db.name} < ${dbFile};
+
     `);
   }
 }
